@@ -4,7 +4,6 @@ import asyncio
 import base64
 from dataclasses import dataclass
 import hashlib
-import json
 
 from aiohttp import ClientError, ClientSession
 
@@ -86,21 +85,27 @@ class SmartSolityApiClient:
             model_name=device["myDeviceModelName"],
         )
 
-    async def get_status(self, device_id: str) -> SmartSolityStatus:
-        """Return the current lock/battery status."""
-        data = await self._authorized_request(
-            "PUT",
-            f"/controlDevice/{device_id}",
-            {
-                "lang": "3",
-                "appSource": "0",
-                "optionValue": "",
-                "controlType": "get_status",
-            },
-        )
-        message = json.loads(data["contents"]["controlDeviceMessage"])
+    async def get_device_status(self) -> SmartSolityStatus | None:
+        """Poll /myDevice for the current lock/battery status.
+
+        The API responds with HTTP 304 when nothing has changed since the
+        last poll, in which case None is returned.
+        """
+        if self._token is None:
+            await self.login()
+        data = await self._get_my_device_conditional()
+        if data is None:
+            return None
+        if data["result"] != 0:
+            await self.login()
+            data = await self._get_my_device_conditional()
+            if data is None:
+                return None
+            if data["result"] != 0:
+                raise SmartSolityApiError(data["errorMessage"] or "request failed")
+        device = data["contents"]["myDeviceList"][0]
         return SmartSolityStatus(
-            is_locked=message["deadBolt"] == 1, battery=message["battery"]
+            is_locked=device["lockerStatus"] == "1", battery=device["battery"]
         )
 
     async def lock(self, device_id: str) -> None:
@@ -143,6 +148,20 @@ class SmartSolityApiClient:
                 response = await self._session.request(
                     method, f"{BASE_URL}{path}", json=payload, headers=headers
                 )
+                return await response.json(content_type=None)
+        except (TimeoutError, ClientError) as err:
+            raise SmartSolityConnectionError(str(err)) from err
+
+    async def _get_my_device_conditional(self) -> dict | None:
+        """GET /myDevice, returning None when the server responds 304 Not Modified."""
+        headers = {"Authorization": self._token} if self._token else {}
+        try:
+            async with asyncio.timeout(REQUEST_TIMEOUT):
+                response = await self._session.request(
+                    "GET", f"{BASE_URL}/myDevice", headers=headers
+                )
+                if response.status == 304:
+                    return None
                 return await response.json(content_type=None)
         except (TimeoutError, ClientError) as err:
             raise SmartSolityConnectionError(str(err)) from err

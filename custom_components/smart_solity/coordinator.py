@@ -45,10 +45,19 @@ class SmartSolityDataUpdateCoordinator(DataUpdateCoordinator[SmartSolityStatus])
 
     @override
     async def _async_update_data(self) -> SmartSolityStatus:
-        """Fetch the latest lock status."""
+        """Poll for a lock status change.
+
+        The API responds with HTTP 304 when nothing has changed since the
+        last poll, in which case the previous status is kept as-is.
+        """
         try:
-            return await self.api.get_status(self.device.device_id)
+            status = await self.api.get_device_status()
         except SmartSolityAuthError as err:
             raise ConfigEntryAuthFailed(str(err)) from err
         except (SmartSolityApiError, SmartSolityConnectionError) as err:
             raise UpdateFailed(str(err)) from err
+        if status is None:
+            if self.data is None:
+                raise UpdateFailed("myDevice reported no change on the initial poll")
+            return self.data
+        return status

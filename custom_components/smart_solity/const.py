@@ -6,4 +6,4 @@ import logging
 DOMAIN = "smart_solity"
 MANUFACTURER = "Solity"
 LOGGER = logging.getLogger(__package__)
-UPDATE_INTERVAL = timedelta(seconds=30)
+UPDATE_INTERVAL = timedelta(seconds=5)
