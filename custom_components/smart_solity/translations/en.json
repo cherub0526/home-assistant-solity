@@ -1,0 +1,31 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Device is already configured",
+            "reauth_successful": "Re-authentication was successful",
+            "unique_id_mismatch": "Re-authentication should be used for the same device, not a new one"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Invalid authentication"
+        },
+        "step": {
+            "reauth_confirm": {
+                "data": {
+                    "password": "Password"
+                },
+                "data_description": {
+                    "password": "The 6-digit app password shown in the Solity app."
+                }
+            },
+            "user": {
+                "data": {
+                    "password": "Password"
+                },
+                "data_description": {
+                    "password": "The 6-digit app password shown in the Solity app."
+                }
+            }
+        }
+    }
+}

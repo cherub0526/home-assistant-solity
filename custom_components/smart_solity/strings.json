@@ -1,0 +1,31 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]",
+      "unique_id_mismatch": "Re-authentication should be used for the same device, not a new one"
+    },
+    "error": {
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]"
+    },
+    "step": {
+      "reauth_confirm": {
+        "data": {
+          "password": "[%key:common::config_flow::data::password%]"
+        },
+        "data_description": {
+          "password": "The 6-digit app password shown in the Solity app."
+        }
+      },
+      "user": {
+        "data": {
+          "password": "[%key:common::config_flow::data::password%]"
+        },
+        "data_description": {
+          "password": "The 6-digit app password shown in the Solity app."
+        }
+      }
+    }
+  }
+}

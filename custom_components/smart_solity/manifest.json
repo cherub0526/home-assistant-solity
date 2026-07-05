@@ -1,0 +1,11 @@
+{
+  "domain": "smart_solity",
+  "name": "Smart Solity",
+  "codeowners": ["@cherub0526"],
+  "config_flow": true,
+  "documentation": "https://github.com/cherub0526/ha-smart-solity",
+  "issue_tracker": "https://github.com/cherub0526/ha-smart-solity/issues",
+  "integration_type": "device",
+  "iot_class": "cloud_polling",
+  "version": "0.1.0"
+}
