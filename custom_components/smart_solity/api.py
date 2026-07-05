@@ -105,7 +105,7 @@ class SmartSolityApiClient:
                 raise SmartSolityApiError(data["errorMessage"] or "request failed")
         device = data["contents"]["myDeviceList"][0]
         return SmartSolityStatus(
-            is_locked=device["lockerStatus"] != "1", battery=device["battery"]
+            is_locked=device["lockerStatus"] == "0", battery=device["battery"]
         )
 
     async def lock(self, device_id: str) -> None:
